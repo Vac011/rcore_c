@@ -9,6 +9,7 @@
 
 // 声明当前(库)crate的其他所有module
 #[macro_use]
+pub mod syscall;
 pub mod config;
 pub mod sharedschedule;
 

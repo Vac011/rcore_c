@@ -19,3 +19,6 @@ vdso = { path = "./vdso"}
 [features]
 inner = []
 kernel = []
+
+[profile.release]
+debug = true

@@ -50,6 +50,7 @@ pub fn main() -> i32 {
     println!("cid4: {}",cid4);
     let cid5 = lib_so::spawn(create_future(), 2, pid, tid, lib_so::CoroutineKind::UserNorm);
     println!("cid5: {}",cid5);
+    coroutine_create(0, 0);
     let cid = lib_so::demo(tid);
     println!("cid: {}",cid);
     lib_so::poll_user_future(pid, tid);

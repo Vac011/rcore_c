@@ -6,6 +6,7 @@
 #[allow(unused)]
 extern crate alloc;
 
+use crate::syscall;
 use crate::config::*;
 use crate::ENTRY;
 use spin::Mutex;
@@ -289,6 +290,7 @@ pub fn get_pending_status(tid: usize, cid: usize) -> bool {
 }
 
 pub fn demo(tid: usize) -> usize{
+    syscall::sys_coroutine_create(0, 0);
     unsafe {
         let heapptr = *(HEAP_BUFFER as *const usize);
         let exe = (heapptr + core::mem::size_of::<LockedHeap>()) as *mut usize as *mut Runtime;

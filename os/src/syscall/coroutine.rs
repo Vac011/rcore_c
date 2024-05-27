@@ -1,6 +1,7 @@
 #![allow(unused)]
 use crate::{
     task::{add_task, current_task, TaskControlBlock},
+    console::*,
 };
 
 pub fn sys_coroutine_create(entry: usize, arg: usize) -> isize {
@@ -9,7 +10,9 @@ pub fn sys_coroutine_create(entry: usize, arg: usize) -> isize {
     // add new task to scheduler
 
     // add new coroutine to current thread
-    todo!("Don't Worry!")
+    println!("\n\ntry\n\n");
+    0
+    //todo!("Don't Worry!")
 }
 
 
