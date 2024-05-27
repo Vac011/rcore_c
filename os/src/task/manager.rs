@@ -3,6 +3,7 @@ use crate::sync::UPIntrFreeCell;
 use alloc::collections::{BTreeMap, VecDeque};
 use alloc::sync::Arc;
 use lazy_static::*;
+use lib_so;
 
 pub struct TaskManager {
     ready_queue: VecDeque<Arc<TaskControlBlock>>,
@@ -22,6 +23,45 @@ impl TaskManager {
     pub fn fetch(&mut self) -> Option<Arc<TaskControlBlock>> {
         self.ready_queue.pop_front()
     }
+
+    //fetch coroutines
+    pub fn fetch_coroutine(&mut self)->Option<Arc<TaskControlBlock>>{
+        let pid = lib_so::max_prio_pid();
+        let tid = lib_so::max_prio_tid(pid);
+        let num = self.ready_queue.len();
+        if num == 0 {return None;}
+        let mut task;
+        let mut cnt = 0;
+        //println!("//--------------------------//");
+        //println!("num of threads:{}",num);
+        loop{
+            task = self.ready_queue.pop_front().unwrap();
+            let pid_p = task.process.upgrade().unwrap().getpid();
+            let tid_p = task.inner_exclusive_access().res.as_ref().unwrap().tid as usize;
+
+            //println!("cnt:{}",cnt);
+
+            if pid ==pid_p && tid == tid_p{
+                //println!("pid returned_here half way is:{}",pid);
+                return Some(task);
+            }
+            self.ready_queue.push_back(task);
+            cnt += 1;
+            if cnt >= num {break;}
+        }
+
+        task = self.ready_queue.pop_front().unwrap();
+
+        let pid_ret = task.process.upgrade().unwrap().getpid();
+        //println!("pid returned_here is:{}",pid_ret);
+        Some(task)
+        //self.ready_queue.pop_front()
+    }
+
+
+
+
+
     // pub fn fetch(&mut self) -> Option<Arc<TaskControlBlock>> {
     //     // // May need to concern affinity
     //     // debug!("tasks total: {}", self.ready_queue.len());
@@ -101,6 +141,11 @@ pub fn wakeup_task(task: Arc<TaskControlBlock>) {
 pub fn fetch_task() -> Option<Arc<TaskControlBlock>> {
     TASK_MANAGER.exclusive_access().fetch()
 }
+
+pub fn fetch_task_coroutine() ->Option<Arc<TaskControlBlock>> {
+    TASK_MANAGER.exclusive_access().fetch_coroutine()
+}
+
 
 pub fn pid2process(pid: usize) -> Option<Arc<ProcessControlBlock>> {
     let map = PID2PCB.exclusive_access();

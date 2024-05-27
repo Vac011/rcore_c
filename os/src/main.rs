@@ -3,6 +3,7 @@
 #![feature(panic_info_message)]
 #![feature(alloc_error_handler)]
 
+
 //use crate::drivers::{GPU_DEVICE, KEYBOARD_DEVICE, MOUSE_DEVICE, INPUT_CONDVAR};
 use crate::drivers::{GPU_DEVICE, KEYBOARD_DEVICE, MOUSE_DEVICE};
 extern crate alloc;
@@ -30,6 +31,7 @@ mod trap;
 
 use crate::drivers::chardev::CharDevice;
 use crate::drivers::chardev::UART;
+use lib_so;
 
 core::arch::global_asm!(include_str!("entry.asm"));
 
@@ -45,6 +47,7 @@ fn clear_bss() {
 }
 
 use lazy_static::*;
+use mm::KERNEL_SPACE;
 use sync::UPIntrFreeCell;
 
 lazy_static! {
@@ -66,11 +69,23 @@ pub fn rust_main() -> ! {
     println!("KERN: init trap");
     trap::init();
     trap::enable_timer_interrupt();
+    KERNEL_SPACE.exclusive_access().add_runtime();
     timer::set_next_trigger();
     board::device_init();
     fs::list_apps();
+
+
+    let n = lib_so::ret_test();
+    println!("inner addr is :{:x}",n);
+
+
     task::add_initproc();
+    println!("we get here 1");
     *DEV_NON_BLOCKING_ACCESS.exclusive_access() = true;
+    println!("we get here 2");
+
     task::run_tasks();
+    println!("we get here 3");
+
     panic!("Unreachable in rust_main!");
 }

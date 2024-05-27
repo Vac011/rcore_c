@@ -6,7 +6,7 @@
 #[allow(unused)]
 extern crate alloc;
 
-use crate::syscall;
+use crate::syscall::*;
 use crate::config::*;
 use crate::ENTRY;
 use spin::Mutex;
@@ -88,7 +88,7 @@ pub fn update_thread_prio(idx: usize,idy: usize, prio: usize) {
 #[inline(never)]
 pub fn max_prio_pid() -> usize {
     let mut ret;
-    let mut pid = 1;
+    let mut pid = 2;
     unsafe {
         ret = PROCESS_PRIO_ARRAY[1].load(Ordering::Relaxed);
     }
@@ -123,7 +123,15 @@ pub fn max_prio_tid(pid: usize) -> usize {
     tid
 }
 
-/// 添加协程，内核和用户态都可以调用
+
+pub fn ret_test()->usize{
+    unsafe{
+        let ret = *(HEAP_BUFFER as *const usize);
+        return ret; 
+    }
+}
+
+// 添加协程，内核和用户态都可以调用
 #[no_mangle]
 #[inline(never)]
 pub fn spawn(future: Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>>, prio: usize, pid: usize, tid: usize, kind: CoroutineKind) -> usize {
@@ -182,19 +190,19 @@ pub fn poll_user_future(pid: usize, tid: usize) {
                 }//如果获取到了任务，则执行该任务。如果任务处于挂起状态，则将其标记为挂起状态；如果任务已完成，则删除该协程。然后更新进程的最高优先级。
                 _ => {
                     // 任务队列不为空，但就绪队列为空，等待任务唤醒.如果没有获取到任务，则让出 CPU 执行权。
-                    // yield_();
+                    sys_yield_coroutine();
                 }
             }
             // 执行完优先级最高的协程，检查优先级，判断是否让权
-            // let max_prio_pid = max_prio_pid();
-            // if pid + 1 != max_prio_pid {
-            //     // yield_();
-            // }
+            let max_prio_pid = max_prio_pid();
+            if pid != max_prio_pid {
+                sys_yield_coroutine();
+            }
 
-            // let max_prio_tid = max_prio_tid(pid);
-            // if tid + 1 != max_prio_tid {
-            //     // yield_();
-            // }
+            let max_prio_tid = max_prio_tid(pid);
+            if tid != max_prio_tid {
+                sys_yield_coroutine();
+            }
         }
         // if tid != 0 {
         //     exit(2);
@@ -290,7 +298,6 @@ pub fn get_pending_status(tid: usize, cid: usize) -> bool {
 }
 
 pub fn demo(tid: usize) -> usize{
-    syscall::sys_coroutine_create(0, 0);
     unsafe {
         let heapptr = *(HEAP_BUFFER as *const usize);
         let exe = (heapptr + core::mem::size_of::<LockedHeap>()) as *mut usize as *mut Runtime;

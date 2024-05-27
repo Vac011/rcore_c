@@ -264,6 +264,17 @@ impl MemorySet {
             asm!("sfence.vma");
         }
     }
+    pub fn add_runtime(&mut self) {
+        self.push(
+            MapArea::new(
+                HEAP_BUFFER.into(),
+                (HEAP_BUFFER + PAGE_SIZE).into(),
+                MapType::Framed,
+                MapPermission::R | MapPermission::W 
+            ),
+            None);
+        unsafe{ *(HEAP_BUFFER as *mut usize) = sdata as usize; }
+    }
     pub fn translate(&self, vpn: VirtPageNum) -> Option<PageTableEntry> {
         self.page_table.translate(vpn)
     }

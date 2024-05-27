@@ -45,6 +45,25 @@ pub fn suspend_current_and_run_next() {
     schedule(task_cx_ptr);
 }
 
+pub fn suspend_current_and_run_next_coroutine(){
+        // There must be an application running.
+    let task = take_current_task().unwrap();
+
+    // ---- access current TCB exclusively
+    let mut task_inner = task.inner_exclusive_access();
+    let task_cx_ptr = &mut task_inner.task_cx as *mut TaskContext;
+    // Change status to Ready
+    task_inner.task_status = TaskStatus::Ready;
+    drop(task_inner);
+    // ---- release current TCB
+
+    // push back to ready queue.
+    add_task(task);
+    // jump to scheduling cycle
+    schedule(task_cx_ptr);
+}
+
+
 /// This function must be followed by a schedule
 pub fn block_current_task() -> *mut TaskContext {
     let task = take_current_task().unwrap();

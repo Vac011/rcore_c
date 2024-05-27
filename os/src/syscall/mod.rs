@@ -35,6 +35,7 @@ const SYSCALL_KEY_PRESSED: usize = 3001;
 
 const SYSCALL_COROUTINE_CREATE: usize = 4000;
 const SYSCALL_GETCID: usize = 4001;
+const SYSCALL_YIELD_COROUTINE: usize = 4010; 
 
 mod fs;
 mod gui;
@@ -90,6 +91,7 @@ pub fn syscall(syscall_id: usize, args: [usize; 3]) -> isize {
         SYSCALL_FRAMEBUFFER_FLUSH => sys_framebuffer_flush(),
         SYSCALL_EVENT_GET => sys_event_get(),
         SYSCALL_KEY_PRESSED => sys_key_pressed(),
+        SYSCALL_YIELD_COROUTINE =>sys_yield_coroutine(),
 
         SYSCALL_COROUTINE_CREATE => sys_coroutine_create(args[0], args[1]),
         SYSCALL_GETCID => sys_getcid(),

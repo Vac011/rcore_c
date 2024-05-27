@@ -7,7 +7,7 @@ extern crate alloc;
 extern crate lib_so;
 
 use alloc::vec;
-use user_lib::{exit, getcid, gettid, getpid, thread_create, waittid};
+use user_lib::{exit, getcid, gettid, getpid, thread_create, waittid, sleep};
 
 use core::pin::Pin;
 use alloc::boxed::Box;
@@ -20,18 +20,19 @@ pub fn thread_a() {
     let pid = getpid() as usize;
     let tid = gettid() as usize;
     let cid1 = lib_so::spawn(create_future(), 3, pid, tid, lib_so::CoroutineKind::UserNorm);
-    println!("cid1: {}",cid1);
+    println!("acid1: {}",cid1);
+    sleep(1000);
     let cid2 = lib_so::spawn(create_future(), 4, pid, tid, lib_so::CoroutineKind::UserNorm);
-    println!("cid2: {}",cid2);
+    println!("acid2: {}",cid2);
     let cid3 = lib_so::spawn(create_future(), 2, pid, tid, lib_so::CoroutineKind::UserNorm);
-    println!("cid3: {}",cid3);
+    println!("acid3: {}",cid3);
     let cid4 = lib_so::spawn(create_future(), 5, pid, tid, lib_so::CoroutineKind::UserNorm);
-    println!("cid4: {}",cid4);
+    println!("acid4: {}",cid4);
     let cid5 = lib_so::spawn(create_future(), 2, pid, tid, lib_so::CoroutineKind::UserNorm);
-    println!("cid5: {}",cid5);
+    println!("acid5: {}",cid5);
     lib_so::poll_user_future(pid, tid);
     let cid = lib_so::demo(tid);
-    println!("cid: {}",cid);
+    println!("acid: {}",cid);
     // lib_so::poll_user_future(pid, tid);
     // exit(1)
 }
@@ -43,18 +44,18 @@ pub fn thread_b() {
     let pid = getpid() as usize;
     let tid = gettid() as usize;
     let cid1 = lib_so::spawn(create_future(), 1, pid, tid, lib_so::CoroutineKind::UserNorm);
-    println!("cid1: {}",cid1);
+    println!("bcid1: {}",cid1);
     let cid2 = lib_so::spawn(create_future(), 4, pid, tid, lib_so::CoroutineKind::UserNorm);
-    println!("cid2: {}",cid2);
+    println!("bcid2: {}",cid2);
     let cid3 = lib_so::spawn(create_future(), 2, pid, tid, lib_so::CoroutineKind::UserNorm);
-    println!("cid3: {}",cid3);
+    println!("bcid3: {}",cid3);
     let cid4 = lib_so::spawn(create_future(), 5, pid, tid, lib_so::CoroutineKind::UserNorm);
-    println!("cid4: {}",cid4);
+    println!("bcid4: {}",cid4);
     let cid5 = lib_so::spawn(create_future(), 2, pid, tid, lib_so::CoroutineKind::UserNorm);
-    println!("cid5: {}",cid5);
+    println!("bcid5: {}",cid5);
     lib_so::poll_user_future(pid, tid);
     let cid = lib_so::demo(tid);
-    println!("cid: {}",cid);
+    println!("bcid: {}",cid);
     // lib_so::poll_user_future(pid, tid);
     // exit(2)
 }

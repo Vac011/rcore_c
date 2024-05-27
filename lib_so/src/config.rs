@@ -8,7 +8,8 @@ pub const TRAMPOLINE: usize = usize::MAX - PAGE_SIZE + 1;
 /// 在共享代码中操作不同进程的堆和 Executor 主要是读取这个虚拟地址中保存的用户程序堆 heap 的虚拟地址
 /// 再来进行分配
 // pub const HEAP_BUFFER: usize = USER_TRAP_BUFFER - PAGE_SIZE;
-pub const HEAP_BUFFER: usize = TRAMPOLINE - PAGE_SIZE;
+pub const BASE_ADDRESS: usize = 0x80200000;
+pub const HEAP_BUFFER: usize = BASE_ADDRESS - PAGE_SIZE;
 /// 用户程序入口
 pub const ENTRY: usize = 0x1000;
 /// CPU数量 + 用户态中断处理线程

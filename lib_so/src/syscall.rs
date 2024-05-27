@@ -1,6 +1,9 @@
 // 调试用
 const SYSCALL_YIELD: usize = 124;
 const SYSCALL_COROUTINE_CREATE: usize = 4000;
+const SYSCALL_YIELD_COROUTINE :usize = 4010;
+
+
 fn syscall(id: usize, args: [usize; 3]) -> isize {
     let mut ret: isize;
     unsafe {
@@ -21,4 +24,8 @@ pub fn sys_coroutine_create(entry: usize, arg: usize) -> isize {
 
 pub fn sys_yield() -> isize {
     syscall(SYSCALL_YIELD, [0, 0, 0])
+}
+
+pub fn sys_yield_coroutine()->isize{
+    syscall(SYSCALL_YIELD_COROUTINE, [0,0,0])
 }
