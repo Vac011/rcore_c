@@ -8,6 +8,8 @@ use crate::timer::get_time_ms;
 use alloc::string::String;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
+use crate::console::*;
+use crate::syscall::sys_sleep;
 
 pub fn sys_exit(exit_code: i32) -> ! {
     exit_current_and_run_next(exit_code);
@@ -21,6 +23,8 @@ pub fn sys_yield() -> isize {
 
 pub fn sys_yield_coroutine()->isize{
     suspend_current_and_run_next_coroutine();
+    // println!("yield");
+    // sys_sleep(10000);
     0
 }
 

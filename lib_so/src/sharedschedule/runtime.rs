@@ -89,8 +89,8 @@ impl Runtime{
             pending_set: [PENDING_SET_VALUE; MAX_THREAD_NUM],
             bitmap: BitMap(0),
             threadmap: [BitMap(0); MAX_THREAD_NUM],
-            max_prio: PRIO_NUM+1,
-            thread_prio: [PRIO_NUM+1; MAX_THREAD_NUM],
+            max_prio: PRIO_NUM,
+            thread_prio: [PRIO_NUM; MAX_THREAD_NUM],
             wr_lock: RunMutex::new(busy_wait),
             waits: Vec::new(),
             temp: 0,
@@ -100,9 +100,9 @@ impl Runtime{
     ///new a coroutine and add it to the queue
     /// par
     /// return
-    pub fn spawn(&mut self, future: Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>>, pid: usize, tid:usize, prio: usize, kind: CoroutineKind) -> usize {
+    pub fn spawn(&mut self, future: Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>>, prio: usize, pid:usize, tid: usize, kind: CoroutineKind) -> usize {
         self.temp += 1;
-        let task = Coroutine::new(future, pid, tid, prio, kind);
+        let task = Coroutine::new(future, prio, pid, tid, kind);
         let cid = task.cid;
         // let tid = gettid();
         let lock = self.wr_lock.lock();

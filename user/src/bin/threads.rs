@@ -19,22 +19,24 @@ pub fn thread_a() {
     // }
     let pid = getpid() as usize;
     let tid = gettid() as usize;
-    let cid1 = lib_so::spawn(create_future(), 3, pid, tid, lib_so::CoroutineKind::UserNorm);
+    let cid1 = lib_so::spawn(create_future(), 1, pid, tid, lib_so::CoroutineKind::UserNorm);
     println!("acid1: {}",cid1);
-    sleep(1000);
-    let cid2 = lib_so::spawn(create_future(), 4, pid, tid, lib_so::CoroutineKind::UserNorm);
+    let cid2 = lib_so::spawn(create_future(), 2, pid, tid, lib_so::CoroutineKind::UserNorm);
     println!("acid2: {}",cid2);
-    let cid3 = lib_so::spawn(create_future(), 2, pid, tid, lib_so::CoroutineKind::UserNorm);
+    let cid3 = lib_so::spawn(create_future(), 3, pid, tid, lib_so::CoroutineKind::UserNorm);
     println!("acid3: {}",cid3);
-    let cid4 = lib_so::spawn(create_future(), 5, pid, tid, lib_so::CoroutineKind::UserNorm);
+    // sleep(100);
+    let cid4 = lib_so::spawn(create_future(), 4, pid, tid, lib_so::CoroutineKind::UserNorm);
     println!("acid4: {}",cid4);
-    let cid5 = lib_so::spawn(create_future(), 2, pid, tid, lib_so::CoroutineKind::UserNorm);
+    let cid5 = lib_so::spawn(create_future(), 5, pid, tid, lib_so::CoroutineKind::UserNorm);
     println!("acid5: {}",cid5);
+    sleep(1000);
     lib_so::poll_user_future(pid, tid);
-    let cid = lib_so::demo(tid);
-    println!("acid: {}",cid);
+    println!("a finish");
+    // let cid = lib_so::demo(tid);
+    // println!("acid: {}",cid);
     // lib_so::poll_user_future(pid, tid);
-    // exit(1)
+    exit(1)
 }
 
 pub fn thread_b() {
@@ -43,53 +45,67 @@ pub fn thread_b() {
     // }
     let pid = getpid() as usize;
     let tid = gettid() as usize;
-    let cid1 = lib_so::spawn(create_future(), 1, pid, tid, lib_so::CoroutineKind::UserNorm);
+    let cid1 = lib_so::spawn(create_future(), 2, pid, tid, lib_so::CoroutineKind::UserNorm);
     println!("bcid1: {}",cid1);
-    let cid2 = lib_so::spawn(create_future(), 4, pid, tid, lib_so::CoroutineKind::UserNorm);
+    let cid2 = lib_so::spawn(create_future(), 2, pid, tid, lib_so::CoroutineKind::UserNorm);
     println!("bcid2: {}",cid2);
-    let cid3 = lib_so::spawn(create_future(), 2, pid, tid, lib_so::CoroutineKind::UserNorm);
+    let cid3 = lib_so::spawn(create_future(), 3, pid, tid, lib_so::CoroutineKind::UserNorm);
     println!("bcid3: {}",cid3);
-    let cid4 = lib_so::spawn(create_future(), 5, pid, tid, lib_so::CoroutineKind::UserNorm);
+    let cid4 = lib_so::spawn(create_future(), 4, pid, tid, lib_so::CoroutineKind::UserNorm);
     println!("bcid4: {}",cid4);
-    let cid5 = lib_so::spawn(create_future(), 2, pid, tid, lib_so::CoroutineKind::UserNorm);
+    let cid5 = lib_so::spawn(create_future(), 5, pid, tid, lib_so::CoroutineKind::UserNorm);
     println!("bcid5: {}",cid5);
+    sleep(1000);
     lib_so::poll_user_future(pid, tid);
-    let cid = lib_so::demo(tid);
-    println!("bcid: {}",cid);
+    println!("b finish");
     // lib_so::poll_user_future(pid, tid);
-    // exit(2)
+    // let cid = lib_so::demo(tid);
+    // println!("bcid: {}",cid);
+    // lib_so::poll_user_future(pid, tid);
+    exit(2)
 }
 
 pub fn thread_c() {
     // for _ in 0..1000 {
-    //     print!("c");
+    //     print!("b");
     // }
-    let id = getcid();
-    let pid = id >> 20;
-    let tid = (id >> 10) & 0x3ff;
-    let cid = id & 0x3ff;
-    println!("\nThe coroutine belongs to pid: {}\n", pid);
-    println!("The coroutine belongs to tid: {}\n", tid);
-    println!("The coroutine belongs to cid: {}\n", cid);
-    
-    // exit(3)
-}
-
-async fn coroutine_a() {
     let pid = getpid() as usize;
     let tid = gettid() as usize;
-    // let cid = id & 0x3ff;
-    println!("The coroutine belongs to pid: {}", pid);
-    println!("The coroutine belongs to tid: {}", tid);
-    // println!("The coroutine belongs to cid: {}\n", cid);
-    let cid = lib_so::demo(tid);
-    println!("cid: {}",cid);
-    let prio = lib_so::demo1(tid);
-    println!("prio: {}",prio);
-    let thread = lib_so::demo2(tid);
-    println!("thread: {}",thread);
-    let bit3 = lib_so::demo3(tid);
-    println!("thread: {}",bit3);
+    let cid1 = lib_so::spawn(create_future(), 1, pid, tid, lib_so::CoroutineKind::UserNorm);
+    println!("bcid1: {}",cid1);
+    let cid2 = lib_so::spawn(create_future(), 2, pid, tid, lib_so::CoroutineKind::UserNorm);
+    println!("bcid2: {}",cid2);
+    let cid3 = lib_so::spawn(create_future(), 3, pid, tid, lib_so::CoroutineKind::UserNorm);
+    println!("bcid3: {}",cid3);
+    let cid4 = lib_so::spawn(create_future(), 4, pid, tid, lib_so::CoroutineKind::UserNorm);
+    println!("bcid4: {}",cid4);
+    let cid5 = lib_so::spawn(create_future(), 5, pid, tid, lib_so::CoroutineKind::UserNorm);
+    println!("bcid5: {}",cid5);
+    sleep(1000);
+    lib_so::poll_user_future(pid, tid);
+    println!("c finish");
+    // lib_so::poll_user_future(pid, tid);
+    // let cid = lib_so::demo(tid);
+    // println!("bcid: {}",cid);
+    // lib_so::poll_user_future(pid, tid);
+    exit(2)
+}
+
+
+async fn coroutine_a() {
+    // let pid = getpid() as usize;
+    // let tid = gettid() as usize;
+    // // let cid = id & 0x3ff;
+    // println!("The coroutine belongs to pid: {}", pid);
+    // println!("The coroutine belongs to tid: {}", tid);
+    // // println!("The coroutine belongs to cid: {}\n", cid);
+    // let cid = lib_so::demo(tid);
+    // println!("cid: {}",cid);
+    // let prio = lib_so::demo1(tid);
+    // println!("prio: {}",prio);
+    // let thread = lib_so::demo2(tid);
+    // println!("thread: {}",thread);
+    println!("----------------EXECUTE------------------");
 }
 
 fn create_future() -> Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>> {
@@ -107,10 +123,13 @@ pub fn main() -> i32 {
         let exit_code = waittid(*tid as usize);
         println!("thread#{} exited with code {}", tid, exit_code);
     }
+    // sleep(1000);
+    
     println!("main thread exited.");
     let pid = getpid() as usize;
     let tid: usize = gettid() as usize;
     println!("mpid: {}",pid);
     println!("mtid: {}",tid);
+    
     0
 }

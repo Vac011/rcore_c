@@ -43,7 +43,7 @@ mod input;
 mod net;
 mod process;
 mod sync;
-mod thread;
+pub mod thread;
 mod coroutine;
 
 use fs::*;

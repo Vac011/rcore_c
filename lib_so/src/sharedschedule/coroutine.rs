@@ -149,7 +149,7 @@ impl Coroutine{
     /// to construct a coroutine object
     /// par
     /// return
-    pub fn new(future: Pin<Box<dyn Future<Output=()> + Send + Sync>>, pid: usize, tid:usize, prio: usize, kind: CoroutineKind) -> Arc<Self> {
+    pub fn new(future: Pin<Box<dyn Future<Output=()> + Send + Sync>>, prio: usize, pid:usize, tid: usize, kind: CoroutineKind) -> Arc<Self> {
         let cid = CidHandle::generate();
         Arc::new(
             Coroutine {

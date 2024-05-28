@@ -8,6 +8,7 @@ mod switch;
 #[allow(clippy::module_inception)]
 mod task;
 
+
 use self::id::TaskUserRes;
 use crate::fs::{open_file, OpenFlags};
 use crate::sbi::shutdown;
@@ -27,6 +28,7 @@ pub use processor::{
 pub use signal::SignalFlags;
 pub use task::{TaskControlBlock, TaskStatus};
 
+
 pub fn suspend_current_and_run_next() {
     // There must be an application running.
     let task = take_current_task().unwrap();
@@ -45,7 +47,7 @@ pub fn suspend_current_and_run_next() {
     schedule(task_cx_ptr);
 }
 
-pub fn suspend_current_and_run_next_coroutine(){
+pub fn suspend_current_and_run_next_coroutine() {
         // There must be an application running.
     let task = take_current_task().unwrap();
 

@@ -7,6 +7,8 @@
 extern crate alloc;
 
 use crate::syscall::*;
+use crate::console::*;
+use crate::println;
 use crate::config::*;
 use crate::ENTRY;
 use spin::Mutex;
@@ -61,9 +63,9 @@ type LockedHeap = Mutex<Heap>;
 // }
 
 /// 各个进程的最高优先级协程，通过共享内存的形式进行通信
-pub static mut PROCESS_PRIO_ARRAY: [AtomicUsize; MAX_PROC_NUM + 1] = [const { AtomicUsize::new(usize::MAX) }; MAX_PROC_NUM + 1];
+pub static mut PROCESS_PRIO_ARRAY: [AtomicUsize; MAX_PROC_NUM ] = [const { AtomicUsize::new(usize::MAX) }; MAX_PROC_NUM ];
 /// 各个线程的最高优先级协程，通过共享内存的形式进行通信
-pub static mut THREAD_PRIO_ARRAY: [AtomicUsize; (MAX_THREAD_NUM + 1) * (MAX_PROC_NUM + 1)] = [const { AtomicUsize::new(usize::MAX) }; (MAX_THREAD_NUM + 1) * (MAX_PROC_NUM + 1)];
+pub static mut THREAD_PRIO_ARRAY: [AtomicUsize; (MAX_THREAD_NUM ) * (MAX_PROC_NUM )] = [const { AtomicUsize::new(usize::MAX) }; (MAX_THREAD_NUM ) * (MAX_PROC_NUM)];
 
 
 
@@ -88,11 +90,11 @@ pub fn update_thread_prio(idx: usize,idy: usize, prio: usize) {
 #[inline(never)]
 pub fn max_prio_pid() -> usize {
     let mut ret;
-    let mut pid = 2;
+    let mut pid= 2;
     unsafe {
-        ret = PROCESS_PRIO_ARRAY[1].load(Ordering::Relaxed);
+        ret = PROCESS_PRIO_ARRAY[0].load(Ordering::Relaxed);
     }
-    for i in 0..MAX_PROC_NUM-1 {
+    for i in 0..MAX_PROC_NUM {
         unsafe {
             let prio = PROCESS_PRIO_ARRAY[i].load(Ordering::Relaxed);
             if prio < ret {
@@ -101,6 +103,7 @@ pub fn max_prio_pid() -> usize {
             }
         }
     }
+    //println!("pid returned is :{}",pid);
     pid
 }
 #[no_mangle]
@@ -109,9 +112,9 @@ pub fn max_prio_tid(pid: usize) -> usize {
     let mut ret;
     let mut tid = 1;
     unsafe {
-        ret = THREAD_PRIO_ARRAY[pid*MAX_THREAD_NUM+1].load(Ordering::Relaxed);
+        ret = THREAD_PRIO_ARRAY[pid*MAX_THREAD_NUM].load(Ordering::Relaxed);
     }
-    for i in 0..MAX_THREAD_NUM-1 {
+    for i in 0..MAX_THREAD_NUM {
         unsafe {
             let prio = THREAD_PRIO_ARRAY[pid*MAX_THREAD_NUM+i].load(Ordering::Relaxed);
             if prio < ret {
@@ -120,6 +123,7 @@ pub fn max_prio_tid(pid: usize) -> usize {
             }
         }
     }
+    //println!("tid returned is :{}",tid);
     tid
 }
 
@@ -138,7 +142,7 @@ pub fn spawn(future: Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>>, pr
     unsafe {
         let heapptr = *(HEAP_BUFFER as *const usize);
         let exe = (heapptr + core::mem::size_of::<LockedHeap>()) as *mut usize as *mut Runtime;
-        let cid = (*exe).spawn(future, pid, tid, prio, kind);
+        let cid = (*exe).spawn(future, prio, pid, tid, kind);
         // 更新优先级标记 TODO
         let prio = (*exe).max_prio;
         update_process_prio(pid, prio);
@@ -158,26 +162,44 @@ pub fn spawn(future: Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>>, pr
 /// 用户程序执行协程
 #[no_mangle]
 #[inline(never)]
-pub fn poll_user_future(pid: usize, tid: usize) {
+pub fn poll_user_future(pid: usize, mut tid: usize) {
     unsafe {
         let heapptr = *(HEAP_BUFFER as *const usize);
         let exe = (heapptr + core::mem::size_of::<LockedHeap>()) as *mut usize as *mut Runtime;
+        // let first_pid = max_prio_pid();
+        // let first_tid = max_prio_tid(first_pid);
+        // if pid != first_pid || tid != first_tid{
+        //     sys_yield_coroutine();
+        //     let tid = first_tid;
+        // }
         loop {
             if (*exe).is_empty() {
                 // println!("ex is empty");如果 Executor 的任务队列为空，则退出循环。
                 break;
             }
+            // let tid = max_prio_tid(pid);
             let task = (*exe).fetch_coroutine(tid as usize);
             match task {
                 Some(task) => {
                     let cid = task.cid;
+
                     // println!("user task kind {:?}", task.kind);
+                    println!("The coroutine belongs to pid: {}", pid);
+                    println!("The coroutine belongs to tid: {}", tid);
+                    println!("The coroutine belongs to cid: {}", cid.0);
+                    let priopr = demo1(tid);
+                    println!("current pro prio: {}",priopr);
+                    let threadpr = demo2(tid);
+                    println!("current thread prio: {}",threadpr);
+
                     match task.execute() {
                         Poll::Pending => {
                             (*exe).pending_coroutine(tid, cid);
+                            println!("pending ");
                         }
                         Poll::Ready(()) => {
                             (*exe).del_coroutine(tid, cid);
+                            println!("ready");
                         }
                     };
                     
@@ -187,6 +209,11 @@ pub fn poll_user_future(pid: usize, tid: usize) {
                     let thread_p: usize = (*exe).thread_prio[tid];
                     update_thread_prio(pid, tid, thread_p);
                     
+                    // let priop = demo1(tid);
+                    // println!("after run pro prio: {}",priop);
+                    // let threadp = demo2(tid);
+                    // println!("after run thread prio: {}",threadp);
+
                 }//如果获取到了任务，则执行该任务。如果任务处于挂起状态，则将其标记为挂起状态；如果任务已完成，则删除该协程。然后更新进程的最高优先级。
                 _ => {
                     // 任务队列不为空，但就绪队列为空，等待任务唤醒.如果没有获取到任务，则让出 CPU 执行权。

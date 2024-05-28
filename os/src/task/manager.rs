@@ -18,6 +18,7 @@ impl TaskManager {
         }
     }
     pub fn add(&mut self, task: Arc<TaskControlBlock>) {
+        //println!("we did add a threads");
         self.ready_queue.push_back(task);
     }
     pub fn fetch(&mut self) -> Option<Arc<TaskControlBlock>> {
@@ -32,17 +33,25 @@ impl TaskManager {
         if num == 0 {return None;}
         let mut task;
         let mut cnt = 0;
-        //println!("//--------------------------//");
-        //println!("num of threads:{}",num);
+        // println!("//--------------------------//");
+        // println!("num of threads:{}",num);
+        // println!("pid to switch:{}",pid);
+        // println!("tid to switch:{}",tid);
+
+
         loop{
             task = self.ready_queue.pop_front().unwrap();
             let pid_p = task.process.upgrade().unwrap().getpid();
             let tid_p = task.inner_exclusive_access().res.as_ref().unwrap().tid as usize;
 
             //println!("cnt:{}",cnt);
+            // println!("pid_p:{}",pid_p);
+            // println!("tid_p:{}",tid_p);
 
             if pid ==pid_p && tid == tid_p{
-                //println!("pid returned_here half way is:{}",pid);
+                // println!("pid returned_here half way is:{}",pid);
+                // println!("tid returned_here half way is:{}",tid);
+                
                 return Some(task);
             }
             self.ready_queue.push_back(task);
@@ -53,7 +62,7 @@ impl TaskManager {
         task = self.ready_queue.pop_front().unwrap();
 
         let pid_ret = task.process.upgrade().unwrap().getpid();
-        //println!("pid returned_here is:{}",pid_ret);
+        // println!("pid returned_here is:{}",pid_ret);
         Some(task)
         //self.ready_queue.pop_front()
     }

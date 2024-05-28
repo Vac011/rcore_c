@@ -12,7 +12,8 @@ pub fn sys_sleep(ms: usize) -> isize {
 }
 
 pub fn sys_mutex_create(blocking: bool) -> isize {
-    let process = current_process();
+    let 
+    process = current_process();
     let mutex: Option<Arc<dyn Mutex>> = if !blocking {
         Some(Arc::new(MutexSpin::new()))
     } else {
