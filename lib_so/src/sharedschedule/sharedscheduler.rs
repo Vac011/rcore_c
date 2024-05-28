@@ -177,7 +177,7 @@ pub fn poll_user_future(pid: usize, mut tid: usize) {
                 // println!("ex is empty");如果 Executor 的任务队列为空，则退出循环。
                 break;
             }
-            // let tid = max_prio_tid(pid);
+            let tid = max_prio_tid(pid);
             let task = (*exe).fetch_coroutine(tid as usize);
             match task {
                 Some(task) => {
