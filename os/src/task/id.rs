@@ -1,6 +1,6 @@
 use super::ProcessControlBlock;
 use crate::config::{KERNEL_STACK_SIZE, PAGE_SIZE, TRAMPOLINE, TRAP_CONTEXT_BASE, USER_STACK_SIZE};
-use crate::console::print;
+use crate::console::*;
 use crate::mm::{MapPermission, PhysPageNum, VirtAddr, KERNEL_SPACE};
 use crate::sync::UPIntrFreeCell;
 use alloc::{
@@ -79,6 +79,7 @@ impl Drop for PidHandle {
 pub fn kernel_stack_position(kstack_id: usize) -> (usize, usize) {
     let top = TRAMPOLINE - kstack_id * (KERNEL_STACK_SIZE + PAGE_SIZE);
     let bottom = top - KERNEL_STACK_SIZE;
+
     (bottom, top)
 }
 
@@ -158,6 +159,7 @@ impl TaskUserRes {
         let pid = process.getpid();
         println!("Create a coroutine:{}",pid);
         lib_so::spawn(create_future(), lib_so::PRIO_NUM, pid, tid, lib_so::CoroutineKind::KernSche);
+        println!("Finish create!");
         task_user_res
     }
 

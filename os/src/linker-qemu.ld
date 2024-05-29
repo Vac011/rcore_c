@@ -31,6 +31,13 @@ SECTIONS
     .data : {
         *(.data.heap)
         *(.data.executor)
+        . = ALIGN(4K);
+        sprocess = .;
+        *(.data.process)
+        . = ALIGN(4K);
+        sthread = .;
+        *(.data.thread)
+        . = ALIGN(4K);
         *(.data .data.*)
         *(.sdata .sdata.*)
     }

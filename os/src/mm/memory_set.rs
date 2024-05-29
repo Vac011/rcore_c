@@ -2,7 +2,7 @@ use super::{frame_alloc, FrameTracker};
 use super::{PTEFlags, PageTable, PageTableEntry};
 use super::{PhysAddr, PhysPageNum, VirtAddr, VirtPageNum};
 use super::{StepByOne, VPNRange};
-use crate::config::{MEMORY_END, MMIO, PAGE_SIZE, TRAMPOLINE, HEAP_BUFFER};
+use crate::config::{MEMORY_END, MMIO, PAGE_SIZE, TRAMPOLINE, HEAP_BUFFER, PROCESS_PRIO_BASE, THREAD_PRIO_BASE};
 use crate::sync::UPIntrFreeCell;
 use alloc::collections::BTreeMap;
 use alloc::sync::Arc;
@@ -23,6 +23,8 @@ extern "C" {
     fn ebss();
     fn ekernel();
     fn strampoline();
+    fn sprocess();
+    fn sthread();
     // fn sruntime();
 }
 
@@ -92,6 +94,22 @@ impl MemorySet {
         );
     }
 
+    fn map_process(&mut self) {
+        self.page_table.map(
+            VirtAddr::from(PROCESS_PRIO_BASE).into(),
+            PhysAddr::from(sprocess as usize).into(),
+            PTEFlags::R | PTEFlags::X | PTEFlags::W,
+        );
+    }
+        
+    fn map_thread(&mut self) {
+        self.page_table.map(
+            VirtAddr::from(THREAD_PRIO_BASE).into(),
+            PhysAddr::from(sthread as usize).into(),
+            PTEFlags::R | PTEFlags::X | PTEFlags::W,
+        );
+    }
+
     // fn map_runtime(&mut self){
     //     self.page_table.map(
     //         VirtAddr::from(HEAP_BUFFER).into(),
@@ -104,6 +122,8 @@ impl MemorySet {
         let mut memory_set = Self::new_bare();
         // map trampoline
         memory_set.map_trampoline();
+        memory_set.map_process();
+        memory_set.map_thread();
         // memory_set.map_runtime();
         // map kernel sections
         // println!(".text [{:#x}, {:#x})", stext as usize, etext as usize);
@@ -183,6 +203,8 @@ impl MemorySet {
         let mut memory_set = Self::new_bare();
         // map trampoline
         memory_set.map_trampoline();
+        memory_set.map_process();
+        memory_set.map_thread();
         // memory_set.map_runtime();
         // map program headers of elf, with U flag
         let elf = xmas_elf::ElfFile::new(elf_data).unwrap();
@@ -242,6 +264,8 @@ impl MemorySet {
         let mut memory_set = Self::new_bare();
         // map trampoline
         memory_set.map_trampoline();
+        memory_set.map_process();
+        memory_set.map_thread();
         // copy data sections/trap_context/user_stack
         for area in user_space.areas.iter() {
             let new_area = MapArea::from_another(area);

@@ -10,7 +10,6 @@ pub fn sys_coroutine_create(entry: usize, arg: usize) -> isize {
     // add new task to scheduler
 
     // add new coroutine to current thread
-    println!("\n\ntry\n\n");
     0
     //todo!("Don't Worry!")
 }

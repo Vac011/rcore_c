@@ -2,6 +2,7 @@
 #![no_main]
 #![feature(panic_info_message)]
 #![feature(alloc_error_handler)]
+#![feature(inline_const)]
 
 
 //use crate::drivers::{GPU_DEVICE, KEYBOARD_DEVICE, MOUSE_DEVICE, INPUT_CONDVAR};
@@ -31,7 +32,8 @@ mod trap;
 
 use crate::drivers::chardev::CharDevice;
 use crate::drivers::chardev::UART;
-use lib_so;
+use lib_so::ret_test;
+use config::*;
 
 core::arch::global_asm!(include_str!("entry.asm"));
 
@@ -72,20 +74,17 @@ pub fn rust_main() -> ! {
     KERNEL_SPACE.exclusive_access().add_runtime();
     timer::set_next_trigger();
     board::device_init();
-    fs::list_apps();
 
+    unsafe{
+        // let ret = *(PROCESS_PRIO_BASE as *const usize);
+        // println!("...{}...", ret);
+        let test = ret_test();
+        println!("...{}...", test);
+    }
 
-    let n = lib_so::ret_test();
-    println!("inner addr is :{:x}",n);
-
-
+    // fs::list_apps();
     task::add_initproc();
-    println!("we get here 1");
     *DEV_NON_BLOCKING_ACCESS.exclusive_access() = true;
-    println!("we get here 2");
-
     task::run_tasks();
-    println!("we get here 3");
-
     panic!("Unreachable in rust_main!");
 }

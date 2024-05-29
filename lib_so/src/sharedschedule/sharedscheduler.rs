@@ -7,7 +7,6 @@
 extern crate alloc;
 
 use crate::syscall::*;
-use crate::console::*;
 use crate::println;
 use crate::config::*;
 use crate::ENTRY;
@@ -67,7 +66,31 @@ pub static mut PROCESS_PRIO_ARRAY: [AtomicUsize; MAX_PROC_NUM ] = [const { Atomi
 /// 各个线程的最高优先级协程，通过共享内存的形式进行通信
 pub static mut THREAD_PRIO_ARRAY: [AtomicUsize; (MAX_THREAD_NUM ) * (MAX_PROC_NUM )] = [const { AtomicUsize::new(usize::MAX) }; (MAX_THREAD_NUM ) * (MAX_PROC_NUM)];
 
-
+pub struct SharedProcessPrioArray {
+    pub data: [AtomicUsize; MAX_PROC_NUM],
+}
+    
+impl SharedProcessPrioArray{
+    pub const fn new() -> Self {
+        Self {
+            data: [const { AtomicUsize::new(PRIO_NUM) }; MAX_PROC_NUM],
+            // data: [const { AtomicUsize::new(usize::MAX) }; MAX_THREAD_NUM * MAX_PROC_NUM],
+        }
+    }
+}
+    
+pub struct SharedThreadPrioArray {
+    pub data: [AtomicUsize; MAX_THREAD_NUM * MAX_PROC_NUM],
+}
+    
+impl SharedThreadPrioArray{
+    pub const fn new() -> Self {
+        Self {
+            // data: [const { AtomicUsize::new(usize::MAX) }; MAX_PROC_NUM],
+            data: [const { AtomicUsize::new(PRIO_NUM) }; MAX_THREAD_NUM * MAX_PROC_NUM],
+        }
+    }
+}
 
     /// 进程的 Executor 调用这个函数，通过原子操作更新自己的最高优先级
 #[no_mangle]
@@ -110,7 +133,7 @@ pub fn max_prio_pid() -> usize {
 #[inline(never)]
 pub fn max_prio_tid(pid: usize) -> usize {
     let mut ret;
-    let mut tid = 1;
+    let mut tid = 0;
     unsafe {
         ret = THREAD_PRIO_ARRAY[pid*MAX_THREAD_NUM].load(Ordering::Relaxed);
     }
@@ -130,7 +153,7 @@ pub fn max_prio_tid(pid: usize) -> usize {
 
 pub fn ret_test()->usize{
     unsafe{
-        let ret = *(HEAP_BUFFER as *const usize);
+        let ret = *(PROCESS_PRIO_BASE as *const usize);
         return ret; 
     }
 }

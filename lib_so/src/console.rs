@@ -1,9 +1,8 @@
 use core::fmt::{self, Write};
+use crate::syscall::{sys_read, sys_write};
 
 const STDIN: usize = 0;
 const STDOUT: usize = 1;
-
-use crate::syscall::{sys_read, sys_write};
 
 pub fn read(fd: usize, buf: &mut [u8]) -> isize {
     sys_read(fd, buf)

@@ -1,4 +1,4 @@
-use lib_so::{Runtime, RunMutex};
+use lib_so::{Runtime, RunMutex, SharedProcessPrioArray, SharedThreadPrioArray};
 use lib_so::{MAX_THREAD_NUM, PRIO_NUM, CidHandle};
 use lib_so::*;
 use alloc::vec::Vec;
@@ -8,6 +8,7 @@ use core::{
     alloc::{GlobalAlloc, Layout},
     ptr::NonNull,
 };
+use core::sync::atomic::AtomicUsize;
 // use customizable_buddy::{BuddyAllocator, LinkedListBuddy, UsizeBuddy};
 use spin::Mutex;
 use crate::config::KERNEL_HEAP_SIZE;
@@ -31,6 +32,13 @@ pub static mut EXECUTOR: Runtime = Runtime::new(true);
 #[link_section = ".bss.memory"]
 static mut MEMORY: [u8; KERNEL_HEAP_SIZE] = [0u8; KERNEL_HEAP_SIZE];
 
+#[no_mangle]
+#[link_section = ".data.process"]
+pub static mut PROCESS_PRIO_ARRAY: SharedProcessPrioArray = SharedProcessPrioArray::new();
+
+#[no_mangle]
+#[link_section = ".data.thread"]
+pub static mut THREAD_PRIO_ARRAY: SharedThreadPrioArray = SharedThreadPrioArray::new();
 
 /// 初始化全局分配器和内核堆分配器。
 pub fn init_heap() {
@@ -81,6 +89,16 @@ pub fn init_heap() {
             temp: 0,
         };
     }
+    
+    unsafe {
+        PROCESS_PRIO_ARRAY.data = [const { AtomicUsize::new(PRIO_NUM) }; MAX_PROC_NUM];
+        THREAD_PRIO_ARRAY.data = [const { AtomicUsize::new(PRIO_NUM) }; MAX_THREAD_NUM * MAX_PROC_NUM];
+    };
+
+    // unsafe{
+    //     let ret = *(sprocess as *const usize);
+    //     println!("...{}...", ret);
+    // }
 }
 
 

@@ -12,6 +12,7 @@
 pub mod syscall;
 pub mod config;
 pub mod sharedschedule;
+#[macro_use]
 pub mod console;
 // 引用外部模块
 extern crate alloc;
