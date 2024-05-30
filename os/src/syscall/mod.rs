@@ -33,8 +33,6 @@ const SYSCALL_FRAMEBUFFER_FLUSH: usize = 2001;
 const SYSCALL_EVENT_GET: usize = 3000;
 const SYSCALL_KEY_PRESSED: usize = 3001;
 
-const SYSCALL_COROUTINE_CREATE: usize = 4000;
-const SYSCALL_GETCID: usize = 4001;
 const SYSCALL_YIELD_COROUTINE: usize = 4010; 
 
 mod fs;
@@ -43,8 +41,7 @@ mod input;
 mod net;
 mod process;
 mod sync;
-pub mod thread;
-mod coroutine;
+mod thread;
 
 use fs::*;
 use gui::*;
@@ -53,7 +50,6 @@ use net::*;
 use process::*;
 use sync::*;
 use thread::*;
-use coroutine::*;
 
 pub fn syscall(syscall_id: usize, args: [usize; 3]) -> isize {
     match syscall_id {
@@ -92,9 +88,6 @@ pub fn syscall(syscall_id: usize, args: [usize; 3]) -> isize {
         SYSCALL_EVENT_GET => sys_event_get(),
         SYSCALL_KEY_PRESSED => sys_key_pressed(),
         SYSCALL_YIELD_COROUTINE =>sys_yield_coroutine(),
-
-        SYSCALL_COROUTINE_CREATE => sys_coroutine_create(args[0], args[1]),
-        SYSCALL_GETCID => sys_getcid(),
         
         _ => panic!("Unsupported syscall_id: {}", syscall_id),
     }

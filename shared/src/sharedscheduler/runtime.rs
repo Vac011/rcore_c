@@ -3,7 +3,6 @@ use alloc::collections::{BTreeMap, VecDeque, BTreeSet};
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 use spin::Mutex;
-// use syscall::yield_;
 use super::{
     coroutine::{Coroutine, CidHandle, CoroutineKind},
     BitMap,
@@ -13,6 +12,7 @@ use core::ops::Add;
 use core::pin::Pin;
 use core::future::Future;
 use crate::config::{MAX_THREAD_NUM, PRIO_NUM};
+use crate::println;
 // use crate::MAX_COR_NUM;
 use core::task::Poll;
 
@@ -67,15 +67,11 @@ pub struct Runtime{
     pub wr_lock: RunMutex,
     /// 执行器线程id
     pub waits: Vec<usize>,
-    pub temp: usize,
 } 
 
 
 
 impl Runtime{
-    ///to construct the runtime......like executor
-    /// par
-    /// return
     pub const fn new(busy_wait: bool) -> Self {
         // const READY_QUEUE_VALUE: Vec<VecDeque<CidHandle>> = Vec::new();
         const PENDING_SET_VALUE: BTreeSet<usize> = BTreeSet::new();
@@ -93,7 +89,6 @@ impl Runtime{
             thread_prio: [PRIO_NUM; MAX_THREAD_NUM],
             wr_lock: RunMutex::new(busy_wait),
             waits: Vec::new(),
-            temp: 0,
         }
     }
 
@@ -101,17 +96,15 @@ impl Runtime{
     /// par
     /// return
     pub fn spawn(&mut self, future: Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>>, prio: usize, pid:usize, tid: usize, kind: CoroutineKind) -> usize {
-        self.temp += 1;
         let task = Coroutine::new(future, prio, pid, tid, kind);
         let cid = task.cid;
-        // let tid = gettid();
         let lock = self.wr_lock.lock();
         // self.ready_queue[tid][prio].push_back(cid);
-        self.ready_queue[tid * PRIO_NUM + prio].insert(cid);
+        self.ready_queue[tid * PRIO_NUM + prio -1].insert(cid);
         self.tasks.insert(cid, task);
         self.bitmap.update(prio, true);
         self.threadmap[tid].update(prio, true);
-        // self.currents[tid] = Some(cid);
+    
         if prio < self.max_prio {
             self.max_prio = prio;
         }
@@ -130,14 +123,14 @@ impl Runtime{
         let lock = self.wr_lock.lock();
         let task = self.tasks.get(&cid).unwrap();
         let p = task.inner.lock().prio;
-        self.ready_queue[tid * PRIO_NUM + p].remove(&cid);
-        if self.ready_queue[tid * PRIO_NUM + p].is_empty() {
+        self.ready_queue[tid * PRIO_NUM + p - 1].remove(&cid);
+        if self.ready_queue[tid * PRIO_NUM + p - 1].is_empty() {
             //刷新位图
             self.threadmap[tid].update(p, false);
         }
         let mut empty = true;
         for i in 0..MAX_THREAD_NUM {
-            empty = empty && self.ready_queue[i * PRIO_NUM + p].is_empty();
+            empty = empty && self.ready_queue[i * PRIO_NUM + p -1].is_empty();
         }
         if empty {
             self.bitmap.update(p, false);
@@ -155,14 +148,14 @@ impl Runtime{
         let _lock = self.wr_lock.lock();
         let task = self.tasks.get(&cid).unwrap();
         let p = task.inner.lock().prio;
-        self.ready_queue[tid * PRIO_NUM + p].remove(&cid);
+        self.ready_queue[tid * PRIO_NUM + p -1].remove(&cid);
         if self.ready_queue[tid * PRIO_NUM + p].is_empty() {
             //刷新位图
             self.threadmap[tid].update(p, false);
         }
         let mut empty = true;
         for i in 0..MAX_THREAD_NUM {
-            empty = empty && self.ready_queue[i * PRIO_NUM + p].is_empty();
+            empty = empty && self.ready_queue[i * PRIO_NUM + p -1].is_empty();
         }
         if empty {
             self.bitmap.update(p, false);
@@ -182,7 +175,7 @@ impl Runtime{
         let prio = self.tasks.get(&cid).unwrap().inner.lock().prio;
         // let tid = gettid() as usize;
         // self.ready_queue[tid][prio].push_back(cid);
-        self.ready_queue[tid * PRIO_NUM + prio].insert(cid);
+        self.ready_queue[tid * PRIO_NUM + prio -1].insert(cid);
         self.bitmap.update(prio, true);
         if prio < self.thread_prio[tid] {
             self.thread_prio[tid] = prio;
@@ -225,7 +218,7 @@ impl Runtime{
             let thread_p = self.thread_prio[tid];
             
             let mut cid = CidHandle(1);
-            if let Some(btree) = self.ready_queue.get(tid * PRIO_NUM + thread_p) {
+            if let Some(btree) = self.ready_queue.get(tid * PRIO_NUM + thread_p -1) {
                 if let Some(first_cid) = btree.iter().next() {
                     cid = *first_cid;
                 }
@@ -243,73 +236,4 @@ impl Runtime{
             task
         }
     }
-
-    pub fn return_cid(&mut self, tid: usize) -> usize {
-        assert!(tid < MAX_THREAD_NUM);
-        let _lock = self.wr_lock.lock();
-        let prio = self.max_prio;
-
-        let thread_p = self.thread_prio[tid];
-
-        let mut cid = CidHandle(1);
-            if let Some(btree) = self.ready_queue.get(tid * PRIO_NUM + thread_p) {
-                if let Some(first_cid) = btree.iter().next() {
-                    cid = *first_cid;
-                }
-            }
-        cid.0
-    }
-
-    pub fn return_prio(&mut self, tid: usize) -> usize {
-        assert!(tid < MAX_THREAD_NUM);
-        let _lock = self.wr_lock.lock();
-        let prio = self.max_prio;
-        prio
-    }
-    pub fn return_thread(&mut self, tid: usize) -> usize {
-        assert!(tid < MAX_THREAD_NUM);
-        let _lock = self.wr_lock.lock();
-        let prio = self.thread_prio[tid];
-        prio
-    }
-    pub fn return_bit(&mut self, tid: usize) -> bool {
-        assert!(tid < MAX_THREAD_NUM);
-        let _lock = self.wr_lock.lock();
-        let prio = self.bitmap.get(1);
-        prio
-    }
 }
-
-
-// impl Runtime {
-//     ///coroutine switch   TODO???   this is a schedule maybe
-//     /// https://rcore-os.cn/rCore-Tutorial-Book-v3/chapter8/1thread.html
-//     /// here is an easy example
-//     /// par
-//     /// return
-//     fn t_yield(&mut self) -> bool {
-//         let mut pos = self.current;
-//         while self.tasks[pos].state != State::Ready {
-//             pos += 1;
-//             if pos == self.tasks.len() {
-//                 pos = 0;
-//             }
-//             if pos == self.current {
-//                 return false;
-//             }
-//         }
-
-//         if self.tasks[self.current].state != State::Available {
-//             self.tasks[self.current].state = State::Ready;
-//         }
-
-//         self.tasks[pos].state = State::Running;
-//         let old_pos = self.current;
-//         self.current = pos;
-
-//         unsafe {
-//             switch(&mut self.tasks[old_pos].ctx, &self.tasks[pos].ctx);
-//         }
-//         self.tasks.len() > 0
-//     }
-// }

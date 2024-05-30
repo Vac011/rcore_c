@@ -14,7 +14,7 @@ use crate::fs::{open_file, OpenFlags};
 use crate::sbi::shutdown;
 use alloc::{sync::Arc, vec::Vec};
 use lazy_static::*;
-use manager::fetch_task;
+// use manager::fetch_task;
 use process::ProcessControlBlock;
 use switch::__switch;
 

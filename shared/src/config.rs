@@ -13,13 +13,13 @@ pub const TRAP_CONTEXT_BASE: usize = TRAMPOLINE - PAGE_SIZE;
 pub const BASE_ADDRESS: usize = 0x80200000;
 pub const HEAP_BUFFER: usize = BASE_ADDRESS - PAGE_SIZE;
 
+
 pub const PROCESS_PRIO_BASE: usize = HEAP_BUFFER - PAGE_SIZE*2; // 示例地址，根据需要调整
 pub const THREAD_PRIO_BASE: usize = PROCESS_PRIO_BASE - PAGE_SIZE*2; // 示例地址，根据需要调整
-
 /// 用户程序入口
 pub const ENTRY: usize = 0x1000;
 /// CPU数量 + 用户态中断处理线程
-pub const MAX_THREAD_NUM: usize = 30;
+pub const MAX_THREAD_NUM: usize = 15;
 
 /// 协程支持的优先级数目
 pub const PRIO_NUM: usize = 8;

@@ -8,7 +8,7 @@
 //use crate::drivers::{GPU_DEVICE, KEYBOARD_DEVICE, MOUSE_DEVICE, INPUT_CONDVAR};
 use crate::drivers::{GPU_DEVICE, KEYBOARD_DEVICE, MOUSE_DEVICE};
 extern crate alloc;
-
+extern crate shared;
 #[macro_use]
 extern crate bitflags;
 
@@ -32,10 +32,20 @@ mod trap;
 
 use crate::drivers::chardev::CharDevice;
 use crate::drivers::chardev::UART;
-use lib_so::ret_test;
-use config::*;
+
+use core::pin::Pin;
+use alloc::boxed::Box;
+use core::future::Future;
 
 core::arch::global_asm!(include_str!("entry.asm"));
+
+// async fn main_coroutine() {
+//     panic!("into the main coroutine");
+// }
+
+fn create_future() -> Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>> {
+    Box::pin(task::run_tasks())
+}
 
 fn clear_bss() {
     extern "C" {
@@ -74,17 +84,13 @@ pub fn rust_main() -> ! {
     KERNEL_SPACE.exclusive_access().add_runtime();
     timer::set_next_trigger();
     board::device_init();
-
-    unsafe{
-        // let ret = *(PROCESS_PRIO_BASE as *const usize);
-        // println!("...{}...", ret);
-        let test = ret_test();
-        println!("...{}...", test);
-    }
-
-    // fs::list_apps();
+    fs::list_apps();
     task::add_initproc();
     *DEV_NON_BLOCKING_ACCESS.exclusive_access() = true;
-    task::run_tasks();
+    // let pid = sys_getpid() as usize;
+    // let tid = sys_gettid() as usize;
+    shared::spawn(create_future(), 7, 0, 0, shared::CoroutineKind::KernSche);
+    shared::poll_future(0, 0);
+    // task::run_tasks();
     panic!("Unreachable in rust_main!");
 }

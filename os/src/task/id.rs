@@ -1,6 +1,5 @@
 use super::ProcessControlBlock;
 use crate::config::{KERNEL_STACK_SIZE, PAGE_SIZE, TRAMPOLINE, TRAP_CONTEXT_BASE, USER_STACK_SIZE};
-use crate::console::*;
 use crate::mm::{MapPermission, PhysPageNum, VirtAddr, KERNEL_SPACE};
 use crate::sync::UPIntrFreeCell;
 use alloc::{
@@ -8,20 +7,6 @@ use alloc::{
     vec::Vec,
 };
 use lazy_static::*;
-use lib_so;
-use core::pin::Pin;
-use alloc::boxed::Box;
-use core::future::Future;
-
-async fn main_coroutine() {
-    panic!("into the main coroutine");
-}
-
-fn create_future() -> Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>> {
-    Box::pin(main_coroutine())
-}
-
-
 
 pub struct RecycleAllocator {
     current: usize,
@@ -156,10 +141,11 @@ impl TaskUserRes {
             task_user_res.alloc_user_res();
         }
         //add a main coroutine
-        let pid = process.getpid();
-        println!("Create a coroutine:{}",pid);
-        lib_so::spawn(create_future(), lib_so::PRIO_NUM, pid, tid, lib_so::CoroutineKind::KernSche);
-        println!("Finish create!");
+        // let pid = process.getpid();
+        // println!("Create a coroutine:{}",pid);
+        // let cid = lib_so::spawn(create_future(), lib_so::PRIO_NUM, pid, tid, lib_so::CoroutineKind::KernSche);
+        // println!("Finish create: {}!",cid);
+        // lib_so::poll_user_future(pid, tid);
         task_user_res
     }
 

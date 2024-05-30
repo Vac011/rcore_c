@@ -37,7 +37,7 @@ lazy_static! {
         unsafe { UPIntrFreeCell::new(Processor::new()) };
 }
 
-pub fn run_tasks() {
+pub async fn run_tasks() {
     loop {
         let mut processor = PROCESSOR.exclusive_access();
         if let Some(task) = fetch_task_coroutine() {

@@ -6,7 +6,7 @@ extern crate user_lib;
 extern crate alloc;
 
 use alloc::vec;
-use user_lib::{exit, thread_create, waittid, getcid, sleep};
+use user_lib::{exit, thread_create, waittid, sleep};
 
 pub fn thread_a() -> ! {
     for _ in 0..1000 {
@@ -26,13 +26,6 @@ pub fn thread_c() -> ! {
     for _ in 0..1000 {
         print!("c");
     }
-    let id = getcid();
-    let pid = id >> 20;
-    let tid = (id >> 10) & 0x3ff;
-    let cid = id & 0x3ff;
-    println!("\nThe coroutine belongs to pid: {}\n", pid);
-    println!("The coroutine belongs to tid: {}\n", tid);
-    println!("The coroutine belongs to cid: {}\n", cid);
     exit(3)
 }
 
@@ -47,7 +40,7 @@ pub fn main() -> i32 {
     //     let exit_code = waittid(*tid as usize);
     //     println!("thread#{} exited with code {}", tid, exit_code);
     // }
-    sleep(10000);
+    sleep(1000);
     println!("main thread exited.");
     0
 }

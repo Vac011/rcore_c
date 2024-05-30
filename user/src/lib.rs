@@ -26,14 +26,14 @@ pub use sync::*;
 use syscall::*;
 pub use task::*;
 
-use lib_so::{Runtime, RunMutex};
-use lib_so::{MAX_THREAD_NUM, PRIO_NUM, CidHandle};
-use lib_so::*;
+use shared::{Runtime, RunMutex};
+use shared::{MAX_THREAD_NUM, PRIO_NUM, CidHandle};
+use shared::*;
 use alloc::collections::{BTreeMap, BTreeSet};
 // use alloc::{vec, collections::VecDeque};
 // use lazy_static::lazy_static;
 
-const USER_HEAP_SIZE: usize = 32768;
+const USER_HEAP_SIZE: usize = 1 << 21 ;
 
 static mut HEAP_SPACE: [u8; USER_HEAP_SIZE] = [0; USER_HEAP_SIZE];
 
@@ -76,14 +76,13 @@ pub extern "C" fn _start(argc: usize, argv: usize) -> ! {
             bitmap: BitMap::new(),
             threadmap: [BitMap::new(); MAX_THREAD_NUM],
             // 初始化 max_prio，默认为 0
-            max_prio: PRIO_NUM+1,
+            max_prio: PRIO_NUM,
             // 初始化 thread_prio 数组，每个元素都为 0
-            thread_prio: [PRIO_NUM+1; MAX_THREAD_NUM],
+            thread_prio: [PRIO_NUM; MAX_THREAD_NUM],
             // 初始化 wr_lock，使用新建的 RunMutex
             wr_lock: RunMutex::new(true),
             // 初始化 waits，使用空的 Vec<usize>
             waits: Vec::new(),
-            temp: 0,
         };
     }
     // ready_queue 数组，每个元素都是空的 Vec<VecDeque<CidHandle>>

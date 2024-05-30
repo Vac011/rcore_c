@@ -1,6 +1,5 @@
 OUTPUT_ARCH(riscv)
-ENTRY(_start)
-BASE_ADDRESS = 0x96000000;
+
 SECTIONS {
     . = BASE_ADDRESS;
     .text : ALIGN(4K) {
