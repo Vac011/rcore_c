@@ -1,6 +1,6 @@
-use lib_so::{Runtime, RunMutex, SharedProcessPrioArray, SharedThreadPrioArray};
-use lib_so::{MAX_THREAD_NUM, PRIO_NUM, CidHandle};
-use lib_so::*;
+use shared::{Runtime, RunMutex, SharedProcessPrioArray, SharedThreadPrioArray};
+use shared::{MAX_THREAD_NUM, PRIO_NUM, CidHandle};
+use shared::*;
 use alloc::vec::Vec;
 use alloc::collections::{BTreeMap, BTreeSet};
 // use alloc::{vec, collections::VecDeque};
@@ -79,19 +79,18 @@ pub fn init_heap() {
             bitmap: BitMap::new(),
             threadmap: [BitMap::new(); MAX_THREAD_NUM],
             // 初始化 max_prio，默认为 0
-            max_prio: PRIO_NUM+1,
+            max_prio: PRIO_NUM,
             // 初始化 thread_prio 数组，每个元素都为 0
-            thread_prio: [PRIO_NUM+1; MAX_THREAD_NUM],
+            thread_prio: [PRIO_NUM; MAX_THREAD_NUM],
             // 初始化 wr_lock，使用新建的 RunMutex
             wr_lock: RunMutex::new(true),
             // 初始化 waits，使用空的 Vec<usize>
             waits: Vec::new(),
-            temp: 0,
         };
     }
     
     unsafe {
-        PROCESS_PRIO_ARRAY.data = [const { AtomicUsize::new(PRIO_NUM) }; MAX_PROC_NUM];
+        PROCESS_PRIO_ARRAY.data = [const { AtomicUsize::new(PRIO_NUM) }; MAX_PROC_NUM+2];
         THREAD_PRIO_ARRAY.data = [const { AtomicUsize::new(PRIO_NUM) }; MAX_THREAD_NUM * MAX_PROC_NUM];
     };
 

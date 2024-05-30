@@ -98,7 +98,7 @@ impl MemorySet {
         self.page_table.map(
             VirtAddr::from(PROCESS_PRIO_BASE).into(),
             PhysAddr::from(sprocess as usize).into(),
-            PTEFlags::R | PTEFlags::X | PTEFlags::W,
+            PTEFlags::R | PTEFlags::X | PTEFlags::W | PTEFlags::U,
         );
     }
         
@@ -106,7 +106,7 @@ impl MemorySet {
         self.page_table.map(
             VirtAddr::from(THREAD_PRIO_BASE).into(),
             PhysAddr::from(sthread as usize).into(),
-            PTEFlags::R | PTEFlags::X | PTEFlags::W,
+            PTEFlags::R | PTEFlags::X | PTEFlags::W| PTEFlags::U,
         );
     }
 
@@ -122,8 +122,18 @@ impl MemorySet {
         let mut memory_set = Self::new_bare();
         // map trampoline
         memory_set.map_trampoline();
-        memory_set.map_process();
-        memory_set.map_thread();
+        // memory_set.map_process();
+        memory_set.page_table.map(
+            VirtAddr::from(PROCESS_PRIO_BASE).into(),
+            PhysAddr::from(sprocess as usize).into(),
+            PTEFlags::R | PTEFlags::X | PTEFlags::W,
+        );
+        // memory_set.map_thread();
+        memory_set.page_table.map(
+            VirtAddr::from(THREAD_PRIO_BASE).into(),
+            PhysAddr::from(sthread as usize).into(),
+            PTEFlags::R | PTEFlags::X | PTEFlags::W,
+        );
         // memory_set.map_runtime();
         // map kernel sections
         // println!(".text [{:#x}, {:#x})", stext as usize, etext as usize);

@@ -11,30 +11,14 @@
 #[macro_use]
 pub mod syscall;
 pub mod config;
-pub mod sharedschedule;
+pub mod sharedscheduler;
 #[macro_use]
 pub mod console;
 // 引用外部模块
 extern crate alloc;
 pub use config::*;
-pub use sharedschedule::*;
+pub use sharedscheduler::*;
 use alloc::boxed::Box;
 use core::future::Future;
 use core::pin::Pin;
-use vdso::get_libfn;
 
-pub fn lib_demo () -> &'static str {
-    "This is from lib_so/sharedshedule/\n"
-}
-
-pub fn lib_max_prio_pid () -> usize {
-    max_prio_pid()
-}
-// get_libfn!(
-//     pub fn spawn(f: Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>>, prio: usize, pid: usize, tid:usize, kind: CoroutineKind) -> usize {}
-// );
-
-
-// get_libfn!(
-//     pub fn lib_demo () -> &'static str{}
-// );

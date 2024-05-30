@@ -15,7 +15,7 @@ lazy_static = { version = "1.4.0", features = ["spin_no_std"] }
 embedded-graphics = "0.7.1"
 oorandom ="11"
 virtio-input-decoder = "0.1.4"
-lib_so = { path = "../lib_so" }
+shared = { path = "../shared" }
 
 [profile.release]
 debug = true

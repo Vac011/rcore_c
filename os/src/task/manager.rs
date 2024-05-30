@@ -3,7 +3,7 @@ use crate::sync::UPIntrFreeCell;
 use alloc::collections::{BTreeMap, VecDeque};
 use alloc::sync::Arc;
 use lazy_static::*;
-use lib_so;
+use shared;
 
 pub struct TaskManager {
     ready_queue: VecDeque<Arc<TaskControlBlock>>,
@@ -21,14 +21,15 @@ impl TaskManager {
         //println!("we did add a threads");
         self.ready_queue.push_back(task);
     }
-    pub fn fetch(&mut self) -> Option<Arc<TaskControlBlock>> {
-        self.ready_queue.pop_front()
-    }
+
+    // pub fn fetch(&mut self) -> Option<Arc<TaskControlBlock>> {
+    //     self.ready_queue.pop_front()
+    // }
 
     //fetch coroutines
     pub fn fetch_coroutine(&mut self)->Option<Arc<TaskControlBlock>>{
-        let pid = lib_so::max_prio_pid();
-        let tid = lib_so::max_prio_tid(pid);
+        let pid = shared::max_prio_pid();
+        let tid = shared::max_prio_tid(pid);
         let num = self.ready_queue.len();
         if num == 0 {return None;}
         let mut task;
@@ -60,50 +61,10 @@ impl TaskManager {
         }
 
         task = self.ready_queue.pop_front().unwrap();
-
-        let pid_ret = task.process.upgrade().unwrap().getpid();
-        // println!("pid returned_here is:{}",pid_ret);
         Some(task)
         //self.ready_queue.pop_front()
     }
 
-
-
-
-
-    // pub fn fetch(&mut self) -> Option<Arc<TaskControlBlock>> {
-    //     // // May need to concern affinity
-    //     // debug!("tasks total: {}", self.ready_queue.len());
-    //     // // error!("max prio pid is {}", crate::lkm::max_prio_pid());
-    //     if !self.user_intr_process_set.is_empty() {
-    //         for pid in self.user_intr_process_set.iter() {
-    //             lib_so::update_prio(pid + 1, 0);
-    //             // info!("update prio: {}", pid);
-    //         }
-    //         // info!("fetch user intr task");
-    //         // return (self.user_intr_task_queue.pop_back(), true);
-    //     }
-    //     let prio_pid = lib_so::max_prio_pid() - 1;
-    //     // 如果内核协程的优先级最高，则
-    //     // if prio_pid == 0 {
-    //     //     return None;
-    //     // }
-    //     let n = self.ready_queue.len();
-    //     if n == 0 { return None; }
-    //     let mut peek;
-    //     let mut cnt = 0;
-    //     loop {
-    //         peek = self.ready_queue.pop_front().unwrap();
-    //         let pid = peek.process.upgrade().unwrap().getpid();
-    //         if pid == prio_pid {
-    //             return Some(peek);
-    //         }
-    //         self.ready_queue.push_back(peek);
-    //         cnt += 1;
-    //         if cnt >= n { break; }
-    //     }
-    //     self.ready_queue.pop_front()
-    // }
     #[allow(unused)]
     pub fn prioritize(&mut self, pid: usize) {
         let q = &mut self.ready_queue;
@@ -147,9 +108,9 @@ pub fn wakeup_task(task: Arc<TaskControlBlock>) {
     add_task(task);
 }
 
-pub fn fetch_task() -> Option<Arc<TaskControlBlock>> {
-    TASK_MANAGER.exclusive_access().fetch()
-}
+// pub fn fetch_task() -> Option<Arc<TaskControlBlock>> {
+//     TASK_MANAGER.exclusive_access().fetch()
+// }
 
 pub fn fetch_task_coroutine() ->Option<Arc<TaskControlBlock>> {
     TASK_MANAGER.exclusive_access().fetch_coroutine()

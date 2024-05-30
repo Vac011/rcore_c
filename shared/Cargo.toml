@@ -1,5 +1,5 @@
 [package]
-name = "lib_so"
+name = "shared"
 version = "0.1.0"
 edition = "2021"
 
@@ -14,7 +14,6 @@ lazy_static = { version = "1.4.0", features = ["spin_no_std"] }
 bit_field = "0.9.0"
 xmas-elf = "0.7.0"
 log = "0.4"
-vdso = { path = "./vdso"}
 
 [features]
 inner = []

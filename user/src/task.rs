@@ -82,10 +82,3 @@ pub fn waittid(tid: usize) -> isize {
     }
 }
 
-pub fn coroutine_create(entry: usize, arg: usize) -> isize {
-    sys_coroutine_create(entry, arg)
-}
-
-pub fn getcid() ->isize {
-    sys_getcid()
-}

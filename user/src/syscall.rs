@@ -33,9 +33,7 @@ const SYSCALL_FRAMEBUFFER_FLUSH: usize = 2001;
 const SYSCALL_EVENT_GET: usize = 3000;
 const SYSCALL_KEY_PRESSED: usize = 3001;
 
-const SYSCALL_COROUTINE_CREATE: usize = 4000;
-const SYSCALL_GETCID: usize = 4001;
-const SYSCALL_YIELD_COROUTINE :usize = 4010;
+// const SYSCALL_YIELD_COROUTINE :usize = 4010;
 
 fn syscall(id: usize, args: [usize; 3]) -> isize {
     let mut ret: isize;
@@ -198,14 +196,6 @@ pub fn sys_key_pressed() -> isize {
     syscall(SYSCALL_KEY_PRESSED, [0, 0, 0])
 }
 
-pub fn sys_coroutine_create(entry: usize, arg: usize) -> isize {
-    syscall(SYSCALL_COROUTINE_CREATE, [entry, arg, 0])
-}
-
-pub fn sys_getcid() -> isize {
-    syscall(SYSCALL_GETCID, [0, 0, 0])
-}
-
-pub fn sys_yield_coroutine()->isize{
-    syscall(SYSCALL_YIELD_COROUTINE, [0,0,0])
-}
+// pub fn sys_yield_coroutine()->isize{
+//     syscall(SYSCALL_YIELD_COROUTINE, [0,0,0])
+// }
