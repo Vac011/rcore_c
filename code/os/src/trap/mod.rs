@@ -2,6 +2,8 @@ mod context;
 
 use crate::config::TRAMPOLINE;
 use crate::syscall::syscall;
+pub use crate::syscall::thread::{sys_gettid};
+pub use crate::syscall::process::{sys_getpid};
 use crate::task::{
     check_signals_of_current, current_add_signal, current_trap_cx, current_trap_cx_user_va,
     current_user_token, exit_current_and_run_next, suspend_current_and_run_next, SignalFlags,
@@ -13,6 +15,8 @@ use riscv::register::{
     scause::{self, Exception, Interrupt, Trap},
     sie, sscratch, sstatus, stval, stvec,
 };
+
+extern crate shared;
 
 global_asm!(include_str!("trap.S"));
 
@@ -55,7 +59,7 @@ fn disable_supervisor_interrupt() {
         sstatus::clear_sie();
     }
 }
-
+static mut cnt: i32 = 0;
 #[no_mangle]
 pub fn trap_handler() -> ! {
     set_kernel_trap_entry();
@@ -96,9 +100,25 @@ pub fn trap_handler() -> ! {
             current_add_signal(SignalFlags::SIGILL);
         }
         Trap::Interrupt(Interrupt::SupervisorTimer) => {
-            set_next_trigger();
-            check_timer();
-            suspend_current_and_run_next();
+            unsafe{
+                if cnt >= 10{
+                    cnt = 0;
+                    set_next_trigger();
+                    check_timer();
+                    suspend_current_and_run_next();
+                }
+                else {
+                    cnt += 1;
+                    let pid = sys_getpid() as usize;
+                    let tid = sys_gettid() as usize;
+                    if shared::check_prio(pid, tid) {
+                        set_next_trigger();
+                        check_timer();
+                        suspend_current_and_run_next();
+                    }
+                }
+            }
+
         }
         Trap::Interrupt(Interrupt::SupervisorExternal) => {
             crate::board::irq_handler();

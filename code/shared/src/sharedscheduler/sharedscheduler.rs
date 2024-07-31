@@ -116,7 +116,7 @@ pub fn max_prio_tid(pid: usize) -> usize {
         // ret = THREAD_PRIO_ARRAY[pid*MAX_THREAD_NUM].load(Ordering::Relaxed);
 
         tid = (*tidarray).data[MAX_PROC_NUM + 1].load(Ordering::Relaxed);
-        tid = (tid+1) % MAX_THREAD_NUM;
+        tid = (tid) % MAX_THREAD_NUM;
         ret = (THREAD_PRIO_BASE as *const usize) as *mut usize as *mut SharedThreadPrioArray;
         dataa = (*ret).data[pid*MAX_THREAD_NUM+tid].load(Ordering::Relaxed);
     }
@@ -258,5 +258,26 @@ pub fn get_pending_status(tid: usize, cid: usize) -> bool {
         let heapptr = *(HEAP_BUFFER as *const usize);
         let exe = (heapptr + core::mem::size_of::<LockedHeap>()) as *mut usize as *mut Runtime;
         return (*exe).is_pending(tid, cid)
+    }
+}
+
+pub fn check_prio(pid: usize, tid: usize) -> bool {
+    unsafe {
+        // let heapptr = *(HEAP_BUFFER as *const usize);
+        // let exe = (heapptr + core::mem::size_of::<LockedHeap>()) as *mut usize as *mut Runtime;
+        // let _lock = (*exe).wr_lock.lock();
+        // let prio: usize = (*exe).max_prio;
+
+        let max_prio_pid = max_prio_pid();
+        if pid != max_prio_pid {
+            return true;
+        }
+
+        let max_prio_tid = max_prio_tid(pid);
+        if tid != max_prio_tid {
+            return true;
+        }
+
+        return false
     }
 }

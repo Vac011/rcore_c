@@ -7,7 +7,7 @@ extern crate alloc;
 extern crate shared;
 
 use alloc::vec;
-use user_lib::{exit, gettid, getpid, thread_create, waittid, sleep, yield_};
+use user_lib::{exit, gettid, getpid, thread_create, waittid, sleep};
 
 use core::pin::Pin;
 use alloc::boxed::Box;
@@ -16,31 +16,55 @@ use core::future::Future;
 
 async fn coroutine_a() {
     println!("----------------EXECUTE------------------");
-    for i in 1..10{
+    for i in 1..1000{
         print!("a");
     }
-    println!("\n----------------FINISH------------------\n");
+    print!("\n");
 }
 
-fn create_future() -> Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>> {
+fn create_futurea() -> Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>> {
     Box::pin(coroutine_a())
+}
+
+async fn coroutine_b() {
+    println!("----------------EXECUTE------------------");
+    for i in 1..1000{
+        print!("b");
+    }
+    print!("\n");
+}
+
+fn create_futureb() -> Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>> {
+    Box::pin(coroutine_b())
+}
+
+async fn coroutine_c() {
+    println!("----------------EXECUTE------------------");
+    for i in 1..1000{
+        print!("c")
+    }
+    print!("\n");
+}
+
+fn create_futurec() -> Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>> {
+    Box::pin(coroutine_c())
 }
 
 pub fn thread_a() {
     let pid = getpid() as usize;
     let tid = gettid() as usize;
     println!("a");
-    let cid1 = shared::spawn(create_future(), 1, pid, tid, shared::CoroutineKind::UserNorm);
+    let cid1 = shared::spawn(create_futurea(), 1, pid, tid, shared::CoroutineKind::UserNorm);
     println!("acid1: {}, prio: 1",cid1);
-    let cid2 = shared::spawn(create_future(), 2, pid, tid, shared::CoroutineKind::UserNorm);
+    let cid2 = shared::spawn(create_futurea(), 2, pid, tid, shared::CoroutineKind::UserNorm);
     println!("acid2: {}, prio: 2",cid2);
-    let cid3 = shared::spawn(create_future(), 3, pid, tid, shared::CoroutineKind::UserNorm);
+    let cid3 = shared::spawn(create_futurea(), 3, pid, tid, shared::CoroutineKind::UserNorm);
     println!("acid3: {}, prio: 3",cid3);
     // let cid4 = shared::spawn(create_future(), 4, pid, tid, shared::CoroutineKind::UserNorm);
     // println!("acid4: {}, prio: 4",cid4);
     // let cid5 = shared::spawn(create_future(), 5, pid, tid, shared::CoroutineKind::UserNorm);
     // println!("acid5: {}, prio: 5",cid5);
-    sleep(100);
+    sleep(60);
     shared::poll_future(pid, tid);
     println!("a finish");
     exit(1)
@@ -50,17 +74,17 @@ pub fn thread_b() {
     let pid = getpid() as usize;
     let tid = gettid() as usize;
     println!("b");
-    let cid1 = shared::spawn(create_future(), 4, pid, tid, shared::CoroutineKind::UserNorm);
+    let cid1 = shared::spawn(create_futureb(), 2, pid, tid, shared::CoroutineKind::UserNorm);
     println!("bcid1: {}, prio: 2",cid1);
-    let cid2 = shared::spawn(create_future(), 2, pid, tid, shared::CoroutineKind::UserNorm);
+    let cid2 = shared::spawn(create_futureb(), 2, pid, tid, shared::CoroutineKind::UserNorm);
     println!("bcid2: {}, prio: 2",cid2);
-    let cid3 = shared::spawn(create_future(), 3, pid, tid, shared::CoroutineKind::UserNorm);
+    let cid3 = shared::spawn(create_futureb(), 3, pid, tid, shared::CoroutineKind::UserNorm);
     println!("bcid3: {}, prio: 3",cid3);
     // let cid4 = shared::spawn(create_future(), 4, pid, tid, shared::CoroutineKind::UserNorm);
     // println!("bcid4: {}, prio: 4",cid4);
     // let cid5 = shared::spawn(create_future(), 5, pid, tid, shared::CoroutineKind::UserNorm);
     // println!("bcid5: {}, prio: 5",cid5);
-    sleep(100);
+    sleep(60);
     shared::poll_future(pid, tid);
     println!("b finish");
     exit(2)
@@ -70,17 +94,17 @@ pub fn thread_c() {
     let pid = getpid() as usize;
     let tid = gettid() as usize;
     println!("c");
-    let cid1 = shared::spawn(create_future(), 3, pid, tid, shared::CoroutineKind::UserNorm);
+    let cid1 = shared::spawn(create_futurec(), 1, pid, tid, shared::CoroutineKind::UserNorm);
     println!("ccid1: {}, prio: 1",cid1);
-    let cid2 = shared::spawn(create_future(), 2, pid, tid, shared::CoroutineKind::UserNorm);
+    let cid2 = shared::spawn(create_futurec(), 2, pid, tid, shared::CoroutineKind::UserNorm);
     println!("ccid2: {}, prio: 2",cid2);
-    let cid3 = shared::spawn(create_future(), 1, pid, tid, shared::CoroutineKind::UserNorm);
+    let cid3 = shared::spawn(create_futurec(), 3, pid, tid, shared::CoroutineKind::UserNorm);
     println!("ccid3: {}, prio: 3",cid3);
     // let cid4 = shared::spawn(create_future(), 4, pid, tid, shared::CoroutineKind::UserNorm);
     // println!("ccid4: {}, prio: 4",cid4);
     // let cid5 = shared::spawn(create_future(), 5, pid, tid, shared::CoroutineKind::UserNorm);
     // println!("ccid5: {}, prio: 5",cid5);
-    sleep(100);
+    // sleep(50);
     shared::poll_future(pid, tid);
     println!("c finish");
     exit(2)

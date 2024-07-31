@@ -10,7 +10,9 @@ use alloc::vec::Vec;
 use crate::println;
 /// 协程 Id
 #[derive(Eq, PartialEq, Debug, Clone, Copy, Hash, Ord, PartialOrd, Default)]
+
 ///Cid data struct according to the define of process Id
+
 pub struct CidHandle(pub usize);
 impl CidHandle {
     /// 生成新的协程 Id
@@ -35,9 +37,7 @@ impl CidHandle {
 }
 
 ///Coroutine Waker TODO
-/// 
 struct CoroutineWaker(CidHandle);
-
 impl CoroutineWaker {
     /// 新建协程 waker
     pub fn new(cid: CidHandle) -> Waker {
@@ -108,7 +108,16 @@ impl Coroutine{
         let mut inner = self.inner.lock();
         let waker = inner.waker.clone();
         let mut context = Context::from_waker(&*waker);
+        if self.should_block() {
+            return Poll::Pending;
+        }
         inner.future.as_mut().poll(&mut context)
+    }
+
+    fn should_block(&self) -> bool {
+        // 在此处添加阻塞条件
+        // self.cid.get_val() == 1
+        false
     }
 
 }

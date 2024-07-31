@@ -59,6 +59,11 @@ pub fn add_timer(expire_ms: usize, task: Arc<TaskControlBlock>) {
     timers.push(TimerCondVar { expire_ms, task });
 }
 
+// 优先级检查定时器
+// pub fn set_priority_check_timer() {
+//     let current_time = get_time();
+//     set_timer(current_time + CLOCK_FREQ / (TICKS_PER_SEC * 10));
+// }
 pub fn check_timer() {
     let current_ms = get_time_ms();
     TIMERS.exclusive_session(|timers| {

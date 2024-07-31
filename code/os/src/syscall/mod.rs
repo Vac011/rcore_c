@@ -39,9 +39,9 @@ mod fs;
 mod gui;
 mod input;
 mod net;
-mod process;
+pub mod process;
 mod sync;
-mod thread;
+pub mod thread;
 
 use fs::*;
 use gui::*;
