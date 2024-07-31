@@ -17,7 +17,9 @@ rCore_c
 * docs为本项目的文档
 * test为测试文件
 
-演示视频链接：
+演示视频链接：https://pan.baidu.com/s/17vZi1Esu1OBhspXPU4ABpQ 
+
+提取码：cbr0
 
 
 技术文档链接：[rCore-c.md](./docs/rCore-c.md)
