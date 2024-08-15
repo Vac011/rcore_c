@@ -1,9 +1,9 @@
 mod context;
-
+#[warn(non_upper_case_globals)]
 use crate::config::TRAMPOLINE;
 use crate::syscall::syscall;
-pub use crate::syscall::thread::{sys_gettid};
-pub use crate::syscall::process::{sys_getpid};
+pub use crate::syscall::thread::sys_gettid;
+pub use crate::syscall::process::sys_getpid;
 use crate::task::{
     check_signals_of_current, current_add_signal, current_trap_cx, current_trap_cx_user_va,
     current_user_token, exit_current_and_run_next, suspend_current_and_run_next, SignalFlags,
@@ -59,7 +59,7 @@ fn disable_supervisor_interrupt() {
         sstatus::clear_sie();
     }
 }
-static mut cnt: i32 = 0;
+static mut CNT: i32 = 0;
 #[no_mangle]
 pub fn trap_handler() -> ! {
     set_kernel_trap_entry();
@@ -101,14 +101,14 @@ pub fn trap_handler() -> ! {
         }
         Trap::Interrupt(Interrupt::SupervisorTimer) => {
             unsafe{
-                if cnt >= 10{
-                    cnt = 0;
+                if CNT >= 10{
+                    CNT = 0;
                     set_next_trigger();
                     check_timer();
                     suspend_current_and_run_next();
                 }
                 else {
-                    cnt += 1;
+                    CNT += 1;
                     let pid = sys_getpid() as usize;
                     let tid = sys_gettid() as usize;
                     if shared::check_prio(pid, tid) {

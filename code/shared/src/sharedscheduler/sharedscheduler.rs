@@ -176,9 +176,10 @@ pub fn poll_future(pid: usize, tid: usize) {
                     let cid = task.cid;
                     
                     // println!("user task kind {:?}", task.kind);
-                    // println!("The coroutine belongs to pid: {}", pid);
-                    // println!("The coroutine belongs to tid: {}", tid);
-                    // println!("The coroutine belongs to cid: {}", cid.0);
+                    println!("\n");
+                    println!("The coroutine belongs to pid: {}", pid);
+                    println!("The coroutine belongs to tid: {}", tid);
+                    println!("The coroutine belongs to cid: {}", cid.0);
                     
                     match task.execute() {
                         Poll::Pending => {

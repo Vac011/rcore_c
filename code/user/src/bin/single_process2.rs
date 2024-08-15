@@ -50,7 +50,7 @@ pub fn thread_b() {
     let pid = getpid() as usize;
     let tid = gettid() as usize;
     println!("b");
-    let cid1 = shared::spawn(create_future(), 4, pid, tid, shared::CoroutineKind::UserNorm);
+    let cid1 = shared::spawn(create_future(), 2, pid, tid, shared::CoroutineKind::UserNorm);
     println!("bcid1: {}, prio: 2",cid1);
     let cid2 = shared::spawn(create_future(), 2, pid, tid, shared::CoroutineKind::UserNorm);
     println!("bcid2: {}, prio: 2",cid2);
@@ -70,11 +70,11 @@ pub fn thread_c() {
     let pid = getpid() as usize;
     let tid = gettid() as usize;
     println!("c");
-    let cid1 = shared::spawn(create_future(), 3, pid, tid, shared::CoroutineKind::UserNorm);
+    let cid1 = shared::spawn(create_future(), 1, pid, tid, shared::CoroutineKind::UserNorm);
     println!("ccid1: {}, prio: 1",cid1);
     let cid2 = shared::spawn(create_future(), 2, pid, tid, shared::CoroutineKind::UserNorm);
     println!("ccid2: {}, prio: 2",cid2);
-    let cid3 = shared::spawn(create_future(), 1, pid, tid, shared::CoroutineKind::UserNorm);
+    let cid3 = shared::spawn(create_future(), 3, pid, tid, shared::CoroutineKind::UserNorm);
     println!("ccid3: {}, prio: 3",cid3);
     // let cid4 = shared::spawn(create_future(), 4, pid, tid, shared::CoroutineKind::UserNorm);
     // println!("ccid4: {}, prio: 4",cid4);

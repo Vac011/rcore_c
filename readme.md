@@ -26,6 +26,14 @@ rCore_c
 
 代码链接：[rCore-c](./code)
 
-How to run ?
+运行：
 
-配置好后，cd /os，最后 make run
+配置好rust环境后，进入./code/os目录，在终端中运行> make run 命令，即可在qemu中运行rCore-c
+
+根据shell提示输入测试程序名进行测试
+
+相关项目：
+
+[rCore](https://github.com/rcore-os/rCore-Tutorial-v3)
+[tornado-os](https://github.com/HUST-OS/tornado-os)
+[rCore-N](https://github.com/duskmoon314/rCore-N)

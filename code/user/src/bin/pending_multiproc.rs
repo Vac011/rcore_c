@@ -25,7 +25,6 @@ async fn coroutine_a() {
     for i in 1..1000{
         print!("a")
     }
-    print!("\n");
 }
 
 fn create_futurea() -> Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>> {
@@ -37,7 +36,6 @@ async fn coroutine_b() {
     for i in 1..1000{
         print!("b")
     }
-    print!("\n");
 }
 
 fn create_futureb() -> Pin<Box<dyn Future<Output=()> + 'static + Send + Sync>> {
@@ -53,7 +51,7 @@ pub fn main() -> i32 {
         let tid = gettid() as usize;
         
         let cid1 = shared::spawn(create_futurea(), 3, pid, tid, shared::CoroutineKind::UserNorm);
-        println!("child_cid1: {}, prio: 1",cid1);
+        println!("child_cid1: {}, prio: 3",cid1);
         let cid1 = shared::spawn(create_futurea(), 4, pid, tid, shared::CoroutineKind::UserNorm);
         println!("child_cid2: {}, prio: 4",cid1);
         let cid1 = shared::spawn(create_futurea(), 3, pid, tid, shared::CoroutineKind::UserNorm);
@@ -67,14 +65,15 @@ pub fn main() -> i32 {
         let tid = gettid() as usize;
         
         let cid1 = shared::spawn(create_futureb(), 1, pid, tid, shared::CoroutineKind::UserNorm);
-        println!("parent_cid1: {}, prio: 2",cid1);
+        println!("parent_cid1: {}, prio: 1",cid1);
         let cid1 = shared::spawn(create_futureb(), 4, pid, tid, shared::CoroutineKind::UserNorm);
         println!("parent_cid2: {}, prio: 4",cid1);
         let cid1 = shared::spawn(create_futureb(), 3, pid, tid, shared::CoroutineKind::UserNorm);
         println!("parent_cid3: {}, prio: 3",cid1);
         // sleep(1000);
-        sleep(5);
+        sleep(3);
         shared::poll_future(pid, tid);
+        println!("\n main process exited");
     }
     0
 }
