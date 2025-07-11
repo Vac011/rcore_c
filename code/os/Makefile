@@ -7,6 +7,9 @@ DISASM_TMP := target/$(TARGET)/$(MODE)/asm
 FS_IMG := ../user/target/$(TARGET)/$(MODE)/fs.img
 APPS := ../user/src/bin/*
 
+# QEMU
+QEMU = qemu-system-riscv64.exe
+
 # BOARD
 BOARD := qemu
 SBI ?= rustsbi
@@ -87,20 +90,20 @@ QEMU_ARGS := -machine virt \
 			 -netdev user,id=net0,hostfwd=udp::6200-:2000,hostfwd=tcp::6201-:80
 
 fdt:
-	@qemu-system-riscv64 -M 128m -machine virt,dumpdtb=virt.out
+	@$(QEMU) -M 128m -machine virt,dumpdtb=virt.out
 	fdtdump virt.out
 
 run-inner: build
-	@qemu-system-riscv64 $(QEMU_ARGS)
+	@$(QEMU) $(QEMU_ARGS)
 
 debug: build
 	@tmux new-session -d \
-		"qemu-system-riscv64 $(QEMU_ARGS) -s -S" && \
+		"$(QEMU) $(QEMU_ARGS) -s -S" && \
 		tmux split-window -h "gdb-multiarch -ex 'file $(KERNEL_ELF)' -ex 'set arch riscv:rv64' -ex 'target remote localhost:1234'" && \
 		tmux -2 attach-session -d
 
 gdbserver: build
-	@qemu-system-riscv64 $(QEMU_ARGS) -s -S &
+	@$(QEMU) $(QEMU_ARGS) -s -S &
 	@echo "*** Now you can run your 'gdb' ***"
 
 gdbclient:

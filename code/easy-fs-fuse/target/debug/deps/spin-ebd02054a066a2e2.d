@@ -1,0 +1,12 @@
+\\wsl.localhost\Ubuntu-20.04\home\lijin\code\easy-fs-fuse\target\debug\deps\libspin-ebd02054a066a2e2.rmeta: C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\lib.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\barrier.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\lazy.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\mutex.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\mutex\spin.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\mutex\ticket.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\once.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\rw_lock.rs
+
+\\wsl.localhost\Ubuntu-20.04\home\lijin\code\easy-fs-fuse\target\debug\deps\spin-ebd02054a066a2e2.d: C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\lib.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\barrier.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\lazy.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\mutex.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\mutex\spin.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\mutex\ticket.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\once.rs C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\rw_lock.rs
+
+C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\lib.rs:
+C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\barrier.rs:
+C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\lazy.rs:
+C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\mutex.rs:
+C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\mutex\spin.rs:
+C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\mutex\ticket.rs:
+C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\once.rs:
+C:\Users\a\.cargo\registry\src\mirrors.ustc.edu.cn-61ef6e0cd06fb9b8\spin-0.7.1\src\rw_lock.rs:
