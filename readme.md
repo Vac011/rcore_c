@@ -1,22 +1,6 @@
-<style>
-   p { font:14pt kai !improtant}
-   /* img{
-    display:block;
-    margin-left:auto;
-    margin-left:auto;
-   } */
-</style>
-
-<!--目录-->
-[TOC]
-
 # proj146技术文档
 
 * 赛题：支持优先级的rust协程调度
-* 学校：武汉大学 WHU
-* 队名：rust协程不排队
-* 成员：葛洋、张珈豪、李晋
-* 指导教师：龚奕利、胡创
 
 ## 赛题描述与完成情况
 ### 目标描述
